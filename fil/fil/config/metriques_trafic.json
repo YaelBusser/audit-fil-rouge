@@ -1,0 +1,83 @@
+{
+  "shoptech_metriques_trafic": {
+    "periode": "Janvier 2025",
+    "source": "Google Analytics + logs serveur",
+
+    "trafic_quotidien": {
+      "visiteurs_uniques_jour": 50000,
+      "pages_vues_jour": 320000,
+      "sessions_jour": 72000,
+      "duree_moyenne_session_secondes": 240,
+      "taux_rebond_percent": 42
+    },
+
+    "trafic_horaire": {
+      "pic_matin": { "heure": "10h-12h", "visiteurs_heure": 5500 },
+      "pic_midi": { "heure": "12h-14h", "visiteurs_heure": 6200 },
+      "pic_soir": { "heure": "20h-22h", "visiteurs_heure": 8500 },
+      "creux_nuit": { "heure": "02h-06h", "visiteurs_heure": 400 },
+      "note": "Le pic du soir représente ~3x le trafic moyen"
+    },
+
+    "commandes": {
+      "commandes_jour": 3000,
+      "panier_moyen_euros": 85,
+      "taux_conversion_percent": 4.2,
+      "chiffre_affaires_jour_euros": 255000,
+      "pic_commandes_heure": 450,
+      "pic_commandes_moment": "20h-21h"
+    },
+
+    "requetes_api": {
+      "requetes_par_seconde_moyenne": 180,
+      "requetes_par_seconde_pic": 650,
+      "endpoints_les_plus_appeles": [
+        { "endpoint": "GET /api/products", "appels_jour": 120000, "temps_reponse_moyen_ms": 2400 },
+        { "endpoint": "GET /api/products/:id", "appels_jour": 85000, "temps_reponse_moyen_ms": 950 },
+        { "endpoint": "POST /api/products/search", "appels_jour": 25000, "temps_reponse_moyen_ms": 3100 },
+        { "endpoint": "POST /api/orders", "appels_jour": 3000, "temps_reponse_moyen_ms": 1800 },
+        { "endpoint": "GET /api/orders/:userId", "appels_jour": 8000, "temps_reponse_moyen_ms": 1200 }
+      ]
+    },
+
+    "infrastructure_actuelle": {
+      "serveur": "VPS OVH — Value B2-15",
+      "cpu": "4 vCPU",
+      "ram_go": 8,
+      "stockage_go": 80,
+      "type_stockage": "SSD NVMe",
+      "bande_passante": "500 Mbps",
+      "os": "Ubuntu 22.04 LTS",
+      "cout_mensuel_euros": 26.40,
+      "localisation": "Gravelines (France)"
+    },
+
+    "utilisation_ressources": {
+      "cpu_moyen_percent": 72,
+      "cpu_pic_percent": 98,
+      "ram_moyenne_go": 6.8,
+      "ram_pic_go": 7.9,
+      "disque_utilise_go": 58,
+      "disque_libre_go": 22,
+      "bande_passante_sortante_jour_go": 45,
+      "note": "CPU à 98% en pic → saturation. RAM proche du max. Disque à 72% et en croissance."
+    },
+
+    "incidents_recents": [
+      { "date": "2025-01-10", "type": "performance", "description": "API injoignable pendant 12 min (OOM kill du process Node.js)", "impact": "~150 commandes perdues" },
+      { "date": "2025-01-11", "type": "performance", "description": "Temps de réponse > 10s pendant 2h (pic trafic + pool BDD saturé)", "impact": "Taux de rebond monté à 68%" },
+      { "date": "2025-01-12", "type": "securite", "description": "Tentatives d'injection SQL détectées dans les logs a posteriori", "impact": "Données potentiellement exposées" },
+      { "date": "2025-01-13", "type": "securite", "description": "Brute force réussi sur compte admin + exfiltration commandes", "impact": "847 commandes clients consultées par un tiers" },
+      { "date": "2025-01-14", "type": "securite", "description": "Endpoint de debug découvert exposant la config BDD", "impact": "Credentials BDD compromises" }
+    ],
+
+    "croissance": {
+      "visiteurs_jour_janvier_2024": 12500,
+      "visiteurs_jour_janvier_2025": 50000,
+      "croissance_annuelle_percent": 300,
+      "projection_juin_2025_visiteurs_jour": 80000,
+      "projection_decembre_2025_visiteurs_jour": 120000,
+      "note": "Si la croissance se maintient, le trafic doublera encore d'ici fin 2025."
+    }
+  }
+}

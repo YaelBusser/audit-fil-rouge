@@ -1,0 +1,50 @@
+# ============================================================
+# ShopTech — Extraits de logs de sécurité
+# Source : access.log + application.log (serveur VPS)
+# Période : 10-15 janvier 2025
+# ============================================================
+
+# --- SECTION 1 : Tentatives d'injection SQL (access.log) ---
+
+[2025-01-12 03:14:22] GET /api/products/1%20OR%201=1 HTTP/1.1 200 — 185.234.72.11 — "Mozilla/5.0"
+[2025-01-12 03:14:23] GET /api/products/1;DROP%20TABLE%20users;-- HTTP/1.1 500 — 185.234.72.11 — "Mozilla/5.0"
+[2025-01-12 03:14:25] POST /api/products/search HTTP/1.1 200 — 185.234.72.11 — body: {"query":"' OR '1'='1"}
+[2025-01-12 03:14:28] POST /api/products/search HTTP/1.1 200 — 185.234.72.11 — body: {"query":"'; SELECT * FROM users; --"}
+[2025-01-12 03:15:01] GET /api/products/1%20UNION%20SELECT%20email,password,null,null,null,null,null,null,null,null,null,null,null%20FROM%20users HTTP/1.1 200 — 185.234.72.11
+# ⚠️ Réponse 200 = la requête a été exécutée avec succès → les données ont potentiellement fuité
+
+# --- SECTION 2 : Tentative de brute force sur /login ---
+
+[2025-01-13 14:02:01] POST /api/auth/login HTTP/1.1 401 — 91.108.56.200 — body: {"email":"admin@shoptech.fr","password":"admin"}
+[2025-01-13 14:02:01] POST /api/auth/login HTTP/1.1 401 — 91.108.56.200 — body: {"email":"admin@shoptech.fr","password":"password"}
+[2025-01-13 14:02:02] POST /api/auth/login HTTP/1.1 401 — 91.108.56.200 — body: {"email":"admin@shoptech.fr","password":"123456"}
+[2025-01-13 14:02:02] POST /api/auth/login HTTP/1.1 401 — 91.108.56.200 — body: {"email":"admin@shoptech.fr","password":"shoptech"}
+[2025-01-13 14:02:03] POST /api/auth/login HTTP/1.1 401 — 91.108.56.200 — body: {"email":"admin@shoptech.fr","password":"ShopTech2024"}
+[2025-01-13 14:02:03] POST /api/auth/login HTTP/1.1 200 — 91.108.56.200 — body: {"email":"admin@shoptech.fr","password":"ShopTech2024!"}
+# ⚠️ 6 tentatives en 2 secondes, réussite à la dernière → mot de passe trouvé, aucun rate limiting
+
+# --- SECTION 3 : Accès suspects post-compromission ---
+
+[2025-01-13 14:03:15] GET /api/orders/1 HTTP/1.1 200 — 91.108.56.200 — Authorization: Bearer eyJhbGciOiJIUzI1NiI...
+[2025-01-13 14:03:16] GET /api/orders/2 HTTP/1.1 200 — 91.108.56.200
+[2025-01-13 14:03:16] GET /api/orders/3 HTTP/1.1 200 — 91.108.56.200
+# ... (énumération séquentielle des commandes — IDOR exploité)
+[2025-01-13 14:05:42] GET /api/orders/847 HTTP/1.1 200 — 91.108.56.200
+# ⚠️ 847 commandes consultées en 2 minutes → exfiltration de données clients
+
+# --- SECTION 4 : Endpoint de debug exposé ---
+
+[2025-01-14 09:22:10] GET /api/products/debug/all HTTP/1.1 200 — 203.45.18.99 — "Mozilla/5.0"
+# ⚠️ L'endpoint de debug renvoie la config BDD (dont le mot de passe) — accessible sans authentification
+
+# --- SECTION 5 : Erreurs serveur récurrentes (application.log) ---
+
+[2025-01-10 08:15:33] ERROR — ENOMEM: JavaScript heap out of memory — route: GET /api/products
+[2025-01-10 12:42:18] ERROR — ENOMEM: JavaScript heap out of memory — route: GET /api/products
+[2025-01-11 09:05:44] ERROR — ENOMEM: JavaScript heap out of memory — route: GET /api/products
+[2025-01-11 16:30:02] ERROR — ETIMEDOUT: connection pool exhausted — route: POST /api/orders
+[2025-01-12 10:15:22] ERROR — ETIMEDOUT: connection pool exhausted — route: GET /api/products
+[2025-01-14 11:00:05] ERROR — ECONNRESET: client connection reset — route: GET /api/products (x47)
+# ⚠️ Fuites mémoire récurrentes (SELECT * sans pagination sur 15K produits)
+# ⚠️ Pool de connexions BDD saturé (max: 5 — insuffisant pour le trafic)
+# ⚠️ Connexions client abandonnées (timeout côté navigateur car réponse trop lente)
