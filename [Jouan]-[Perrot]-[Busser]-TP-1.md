@@ -1,4 +1,6 @@
 # TP 1 — Cartographie d'audit ShopTech — Réponse
+Groupe :
+Amaury JOUAN Adrien PERROT Yaël BUSSER
 
 ---
 
@@ -175,3 +177,7 @@
 
 **3. Différence notable à partager en plénière :**
 *   **Le dilemme de l'urgence vs l'importance :** Doit-on d'abord corriger la vulnérabilité de sécurité qui laisse fuiter les données (IDOR / Authentification P1 pour nous), ou d'abord stabiliser le serveur qui s'effondre sous la charge (Nginx P1 pour eux) ? C'est le point de débat principal que nous souhaitons remonter.
+
+
+Groupe :
+Amaury JOUAN Adrien PERROT Yaël BUSSER
