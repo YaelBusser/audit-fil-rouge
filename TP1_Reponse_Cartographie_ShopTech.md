@@ -112,13 +112,54 @@
 
 ## Étape 2 — Associer des indicateurs à chaque composant
 
-> _À compléter…_
+### 1. Nginx
+*   **Disponibilité (Uptime) :** Pourcentage de temps où le proxy court en ligne. *Source : Pingdom, StatusCake.*
+*   **Performance (Temps de réponse) :** Temps de traitement moyen. *Source : Logs d'accès Nginx (`$request_time`).*
+*   **Sécurité (HTTPS/TLS) :** Score de sécurisation TLS. *Source : Qualys SSL Labs.*
+
+### 2. API Node.js / Express
+*   **Fiabilité (Taux d'erreur) :** Proportion de réponses HTTP 5xx. *Source : Logs applicatifs ou APM (ex: Datadog/New Relic).*
+*   **Performance (Latence) :** Temps de traitement par endpoint. *Source : APM.*
+*   **Sécurité (Dette de dépendances) :** Nombre de vulnérabilités dans les paquets liés. *Source : `npm audit` / Snyk.*
+
+### 3. Authentification JWT
+*   **Sécurité (Tentatives de connexion) :** Nombre d'échecs de login pour détecter le brute force. *Source : Logs applicatifs.*
+*   **Sécurité (Expiration) :** Durée de vie des tokens émis. *Source : Code ou configuration JWT.*
+
+### 4. PostgreSQL
+*   **Performance (Slow Queries) :** Pourcentage des requêtes excédant 500ms. *Source : Extension `pg_stat_statements`.*
+*   **Fiabilité (Saturation du Pool) :** Nbre de connexions actives / Limite max. *Source : `pg_stat_activity`.*
+*   **Maintenabilité (Taille de base) :** Volume de données et taux d'index inutilisés. *Source : Vues système pg_catalog.*
+
+### 5. Infrastructure VPS OVH
+*   **Performance (Usage CPU/RAM) :** Moyenne et pics d'utilisation. *Source : htop, Prometheus, ou espace client OVH.*
+*   **Fiabilité (Espace Disque) :** Stockage restant. *Source : Systémique (`df -h`).*
+*   **Disponibilité (OOM Kills) :** Fréquence d'arrêts brutaux de processus par l'OS. *Source : `/var/log/syslog`.*
+
+### 6. Métriques de trafic & performance
+*   **Performance (RPS) :** Requêtes par seconde supportées (moyenne et pic). *Source : Load Balancer / APM.*
+
+### 7. Logs & gestion des incidents
+*   **Sécurité/Maintenabilité (MTTD) :** Temps moyen de détection (attaques/crash). *Source : Outil de ticketing.*
+*   **Sécurité/Maintenabilité (MTTR) :** Temps moyen de résolution. *Source : Plateforme ITSM (ex: Jira).*
+
+### 8. Pratiques de développement
+*   **Maintenabilité (Dette Technique) :** Code Coverage, Code Smells. *Source : SonarQube.*
+*   **Sécurité (Secrets Exposés) :** Quantité de credentials découverts (SAST/TruffleHog). *Source : GitGuardian.*
 
 ---
 
 ## Étape 3 — Prioriser les composants
 
-> _À compléter…_
+| Priorité | Composant | Justification de l'audit (Contexte ShopTech) |
+| :--- | :--- | :--- |
+| **CRITIQUE (P1)** | **Infrastructure VPS OVH** | VPS saturé (CPU à 98%, RAM presque au max) sans redondance (SPOF) = Risque majeur de d'arrêt complet du service. |
+| **CRITIQUE (P1)** | **PostgreSQL** | Les lenteurs (requêtes N+1 et sans index) aggravent la saturation du VPS et les connexions échouent (bottleneck majeur des performances). |
+| **CRITIQUE (P1)** | **API Node.js & Auth JWT** | Les vulnérabilités IDOR et l'absence de protection brute-force/rate limiting causent d'ores et déjà des fuites de données clients avérées. |
+| **IMPORTANT (P2)** | **Nginx** | Une bonne configuration (Cache, Rate Limit, HTTPS) soulagerait la charge de l'API et l'infrastructure sous-jacente face à l'accroissement du trafic. |
+| **IMPORTANT (P2)** | **Logs & gestion des incidents** | Sans bonne visibilité, les attaques et crashs futurs risquent de passer encore inaperçus sans remontée d'alerte claire. |
+| **SECONDAIRE (P3)** | **Pratiques de développement** | Important sur le long terme (code propre, CI/CD), mais prioritaire de stabiliser le serveur et sécuriser l'API en urgence. |
+| **SECONDAIRE (P3)** | **Métriques Trafic/Perf** | Doit être audité par la suite pour s'assurer que les KPIs commerciaux ne sont plus impactés, mais pas un composant d'infrastructure direct. |
 
 ---
 
