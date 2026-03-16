@@ -97,18 +97,29 @@ Amaury JOUAN Adrien PERROT Yaël BUSSER
 
 ---
 
-### 📋 Synthèse — Liste des 8 composants identifiés
+### 🔵 Couche Logicielle Client / Application Front-End (SPA)
+
+| Élément                 | Détail observé                                                                                                                                                                                                                                                                                                                                                                   |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fichiers sources**    | Code source de la SPA (React, Vue, ou autre)                                                                                                                                                                                                                                                                                                     |
+| **Rôle**                | Interface utilisateur via navigateur (Parcours d'achat)                                                                                                                                                                                                                                                                                                                        |
+| **Éléments à examiner** | Poids de l'application (faire attention à ne pas installer plein de packages inutilisés), performances, accessibilité et **bons scores SEO (Lighthouse)**. Le projet gagnerait à utiliser Vue.js, car honnêtement, Vue.js c'est mieux que React ! 😉 |
+
+---
+
+### 📋 Synthèse — Liste des 9 composants identifiés
 
 | #   | Composant                                  | Couche                  |
 | --- | ------------------------------------------ | ----------------------- |
 | 1   | **Nginx** (reverse proxy)                  | Réseau                  |
 | 2   | **API Node.js / Express**                  | Application             |
 | 3   | **Authentification JWT**                   | Sécurité applicative    |
-| 4   | **PostgreSQL** (schéma, requêtes, données) | Base de données         |
+| 4   | **PostgreSQL (et ses sauvegardes !!!)**    | Base de données         |
 | 5   | **Infrastructure VPS OVH**                 | Infrastructure          |
 | 6   | **Métriques de trafic & performance**      | Performance             |
 | 7   | **Logs & gestion des incidents**           | Sécurité opérationnelle |
 | 8   | **Pratiques de développement**             | Organisationnel         |
+| 9   | **Application Front-End (SPA)**            | Application Client      |
 
 ---
 
@@ -132,6 +143,7 @@ Amaury JOUAN Adrien PERROT Yaël BUSSER
 *   **Performance (Slow Queries) :** Pourcentage des requêtes excédant 500ms. *Source : Extension `pg_stat_statements`.*
 *   **Fiabilité (Saturation du Pool) :** Nbre de connexions actives / Limite max. *Source : `pg_stat_activity`.*
 *   **Maintenabilité (Taille de base) :** Volume de données et taux d'index inutilisés. *Source : Vues système pg_catalog.*
+*   **Sécurité / Fiabilité (Sauvegardes) :** FAIRE TRÈS ATTENTION aux sauvegardes : processus, rétention, et possibilité de restauration complète. *Source : Scripts de backups, test de restauration (DRP).*
 
 ### 5. Infrastructure VPS OVH
 *   **Performance (Usage CPU/RAM) :** Moyenne et pics d'utilisation. *Source : htop, Prometheus, ou espace client OVH.*
@@ -149,6 +161,10 @@ Amaury JOUAN Adrien PERROT Yaël BUSSER
 *   **Maintenabilité (Dette Technique) :** Code Coverage, Code Smells. *Source : SonarQube.*
 *   **Sécurité (Secrets Exposés) :** Quantité de credentials découverts (SAST/TruffleHog). *Source : GitGuardian.*
 
+### 9. Application Front-End (SPA)
+*   **Performance / SEO :** Scores Lighthouse de l'application (Performance, SEO, Accessibilité). *Source : Google Chrome Lighthouse.*
+*   **Maintenabilité (Poids) :** Taille du bundle JS et attention à l'accumulation de packages Node installés via NPM (qui alourdissent l'app). *Source : Webpack Bundle Analyzer.*
+
 ---
 
 ## Étape 3 — Prioriser les composants
@@ -160,6 +176,7 @@ Amaury JOUAN Adrien PERROT Yaël BUSSER
 | **CRITIQUE (P1)** | **API Node.js & Auth JWT** | Les vulnérabilités IDOR et l'absence de protection brute-force/rate limiting causent d'ores et déjà des fuites de données clients avérées. |
 | **IMPORTANT (P2)** | **Nginx** | Une bonne configuration (Cache, Rate Limit, HTTPS) soulagerait la charge de l'API et l'infrastructure sous-jacente face à l'accroissement du trafic. |
 | **IMPORTANT (P2)** | **Logs & gestion des incidents** | Sans bonne visibilité, les attaques et crashs futurs risquent de passer encore inaperçus sans remontée d'alerte claire. |
+| **IMPORTANT (P2)** | **Application Front-End** | Vital pour le SEO (Lighthouse) et l'expérience d'acquisition utilisateur. Piste d'audit : la quantité de packages installés. (Et rappel : une interface sous Vue.js, c'est mieux que React ! 😉) |
 | **SECONDAIRE (P3)** | **Pratiques de développement** | Important sur le long terme (code propre, CI/CD), mais prioritaire de stabiliser le serveur et sécuriser l'API en urgence. |
 | **SECONDAIRE (P3)** | **Métriques Trafic/Perf** | Doit être audité par la suite pour s'assurer que les KPIs commerciaux ne sont plus impactés, mais pas un composant d'infrastructure direct. |
 
