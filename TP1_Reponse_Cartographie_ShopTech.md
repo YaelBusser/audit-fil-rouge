@@ -165,4 +165,13 @@
 
 ## Étape 4 — Restitution croisée
 
-> _À compléter…_
+### 📝 Retour de l'échange avec le binôme voisin (Lino et Nathan)
+
+**1. Ce que nous avions oublié :**
+*   **Indicateur sur Nginx :** Nous n'avions pas pensé à mesurer spécifiquement le taux d'erreurs 502/504 renvoyées par Nginx (qui indiquerait une perte de connexion avec l'API Node.js). Le binôme B l'avait bien identifié comme essentiel pour la fiabilité.
+
+**2. Différences dans les priorités :**
+*   **Priorité accordée à Nginx :** Nathan et Lino ont classés Nginx en **CRITIQUE (P1)**, arguant qu'il est le point d'entrée unique et que le manque de "Rate Limiting" est la cause directe des crashs de l'API sous la charge. Nous l'avions mis en P2, privilégiant la réparation de l'infrastructure VPS et de la BDD.
+
+**3. Différence notable à partager en plénière :**
+*   **Le dilemme de l'urgence vs l'importance :** Doit-on d'abord corriger la vulnérabilité de sécurité qui laisse fuiter les données (IDOR / Authentification P1 pour nous), ou d'abord stabiliser le serveur qui s'effondre sous la charge (Nginx P1 pour eux) ? C'est le point de débat principal que nous souhaitons remonter.
